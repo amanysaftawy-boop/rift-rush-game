@@ -2,214 +2,662 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>RIFT RUSH | Play the Adventure</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RIFT RUSH | MTB Adventure</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#080d20;color:white;font-family:Arial,sans-serif}
-header{padding:18px;text-align:center;background:#111b39;border-bottom:2px solid #00e5ff}
-h1{font-size:38px;margin:5px;color:#00e5ff;letter-spacing:3px}
-.tag{color:#ffcb42;letter-spacing:3px;font-size:12px}
-main{max-width:850px;margin:auto;padding:18px;text-align:center}
-.card{background:#152040;border:1px solid #34476c;border-radius:20px;padding:22px;margin:15px 0}
-.worlds{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.world{border:2px solid #34476c;border-radius:18px;padding:22px 8px;cursor:pointer;background:#1c2c50;color:white;font-size:16px}
-.world:hover,.world.selected{border-color:#00e5ff;background:#264570}
-.emoji{font-size:48px;display:block;margin-bottom:12px}
-button{font-family:inherit}
-.action{background:linear-gradient(90deg,#00d5ff,#5575ff);border:0;border-radius:12px;padding:15px 25px;color:#071025;font-weight:bold;font-size:18px;cursor:pointer;margin:8px}
-.action:disabled{opacity:.45}
-.secondary{background:#263b65;color:white}
-.hidden{display:none}
-#grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;max-width:390px;margin:20px auto}
-.tile{aspect-ratio:1;border-radius:12px;border:2px solid #3d5a83;background:#203456;cursor:pointer}
-.tile.flash{background:#ffe35b;box-shadow:0 0 22px #ffe35b}
-.tile.correct{background:#16d7a2}
-.tile.wrong{background:#ff5674}
-#status{min-height:55px;font-size:18px;line-height:1.5}
-.stats{display:flex;justify-content:center;gap:22px;flex-wrap:wrap;color:#8feeff}
-.small{font-size:13px;color:#a9b8d4}
-@media(max-width:450px){h1{font-size:30px}.world{padding:18px 5px}}
+body{
+margin:0;
+background:#080e22;
+color:white;
+font-family:Arial,sans-serif;
+text-align:center;
+}
+header{
+background:#111b38;
+padding:14px;
+border-bottom:2px solid #00e5ff;
+}
+h1{
+color:#00e5ff;
+font-size:34px;
+margin:4px;
+letter-spacing:3px;
+}
+.tag{color:#ffc847;font-size:12px;letter-spacing:3px}
+main{max-width:950px;margin:auto;padding:12px}
+.panel{
+background:#172344;
+border:1px solid #345077;
+border-radius:18px;
+padding:15px;
+margin:12px 0;
+}
+button{
+border:0;
+border-radius:12px;
+padding:13px 20px;
+font-size:17px;
+font-weight:bold;
+cursor:pointer;
+background:#00d9ff;
+color:#061226;
+touch-action:manipulation;
+}
+button:active{transform:scale(.96)}
+.secondary{background:#314d80;color:white}
+.hidden{display:none!important}
+.stats{
+display:flex;
+justify-content:center;
+gap:20px;
+flex-wrap:wrap;
+margin:12px;
+color:#8cf4ff;
+}
+canvas{
+width:100%;
+max-width:900px;
+height:auto;
+border-radius:15px;
+border:2px solid #415d8e;
+background:#6bc7f5;
+display:block;
+margin:auto;
+touch-action:none;
+}
+.controls{
+display:flex;
+justify-content:center;
+gap:12px;
+margin:15px 0;
+}
+.controls button{min-width:100px}
+.worlds{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:12px;
+}
+.world{
+background:#23395d;
+padding:24px 8px;
+border-radius:15px;
+border:2px solid #3d5d83;
+}
+.world.active{border-color:#00e5ff}
+.world.locked{opacity:.55}
+.world .icon{font-size:42px;display:block;margin-bottom:10px}
+#memory{
+background:#101a37;
+border:2px solid #ffc847;
+border-radius:15px;
+padding:18px;
+margin:12px auto;
+max-width:600px;
+}
+#sequence{
+font-size:38px;
+letter-spacing:12px;
+margin:15px;
+color:#ffe36e;
+}
+#message{min-height:28px;color:#ffe36e;font-weight:bold}
+.small{font-size:13px;color:#aebfdb}
+@media(max-width:500px){
+h1{font-size:27px}
+.controls button{min-width:75px;padding:13px}
+.world{padding:15px 5px}
+}
 </style>
 </head>
+
 <body>
 
 <header>
 <h1>⚡ RIFT RUSH</h1>
-<div class="tag">YOUR WORLD. YOUR RULES.</div>
+<div class="tag">RIDE. OUTSMART. CONQUER.</div>
 </header>
 
 <main>
+
 <div class="stats">
 <span>⭐ XP: <b id="xp">0</b></span>
-<span>🏆 Wins: <b id="wins">0</b></span>
-<span>🔥 Level: <b id="level">1</b></span>
+<span>🏁 Distance: <b id="distance">0</b>m</span>
+<span>❤️ Lives: <b id="lives">3</b></span>
+<span>🏆 Best: <b id="best">0</b>m</span>
 </div>
 
-<section id="home">
-<div class="card">
-<h2>CHOOSE YOUR WORLD</h2>
-<p>Four worlds. Endless challenges. One legend.</p>
+<section id="home" class="panel">
+<h2>CHOOSE YOUR ADVENTURE</h2>
 <div class="worlds">
-<button class="world selected" onclick="choose(0,this)">
-<span class="emoji">🚵</span>
-<b>MTB WILDLANDS</b><br><small>Ride the impossible</small>
-</button>
-<button class="world" onclick="choose(1,this)">
-<span class="emoji">🚀</span>
-<b>GALAXY RIFT</b><br><small>Escape the unknown</small>
-</button>
-<button class="world" onclick="choose(2,this)">
-<span class="emoji">✈️</span>
-<b>SKY STRIKE</b><br><small>Rule the skies</small>
-</button>
-<button class="world" onclick="choose(3,this)">
-<span class="emoji">🤖</span>
-<b>BOT ARENA</b><br><small>Outsmart the machines</small>
-</button>
+<div class="world active">
+<span class="icon">🚵</span>
+<b>MTB WILDLANDS</b>
+<p>Downhill Rush</p>
+</div>
+<div class="world locked">
+<span class="icon">🚀</span>
+<b>GALAXY RIFT</b>
+<p>Coming Soon</p>
+</div>
+<div class="world locked">
+<span class="icon">✈️</span>
+<b>SKY STRIKE</b>
+<p>Coming Soon</p>
+</div>
+<div class="world locked">
+<span class="icon">🤖</span>
+<b>BOT ARENA</b>
+<p>Coming Soon</p>
+</div>
 </div>
 <br>
-<button class="action" onclick="start()">⚡ START MISSION</button>
-</div>
-<div class="card">
-<h3>🎮 GAME DIRECTOR EDITION</h3>
-<p>Explore the worlds, complete missions and unlock higher levels.</p>
-<p class="small">First playable prototype • Solo missions</p>
-</div>
+<button onclick="startGame()">🚵 START MTB RACE</button>
+<p class="small">Jump over obstacles. Collect stars. Crack secret routes.</p>
 </section>
 
 <section id="game" class="hidden">
-<div class="card">
-<h2 id="missionTitle">MISSION</h2>
-<p id="story"></p>
-<div id="status"></div>
-<div id="grid"></div>
-<button class="action" id="launch" onclick="showPattern()">▶ SCAN ROUTE</button>
-<button class="action secondary" onclick="back()">↩ WORLD SELECT</button>
+
+<canvas id="canvas" width="900" height="440"></canvas>
+
+<div class="controls">
+<button id="jumpBtn">⬆️ JUMP</button>
+<button class="secondary" onclick="togglePause()">⏸ PAUSE</button>
+<button class="secondary" onclick="goHome()">🏠 HOME</button>
 </div>
+
+<div id="message"></div>
+
+<div id="memory" class="hidden">
+<h2>🔐 SECRET ROUTE</h2>
+<p id="memoryText">Memorize the route!</p>
+<div id="sequence"></div>
+<div id="answerButtons" class="hidden">
+<button onclick="answer('L')">⬅️ LEFT</button>
+<button onclick="answer('R')">➡️ RIGHT</button>
+</div>
+<p id="memoryProgress"></p>
+</div>
+
 </section>
+
 </main>
 
 <script>
-const names=["MTB WILDLANDS","GALAXY RIFT","SKY STRIKE","BOT ARENA"];
-const stories=[
-"🚵 Scan the mountain trail. Remember the safe checkpoints before the fog arrives!",
-"🚀 Scan the star portals. Memorize the jump sequence to escape the asteroid field!",
-"✈️ Your navigation system is offline. Memorize the flight path and guide your jet!",
-"🤖 The security bots are approaching. Memorize the energy nodes to disable the shield!"
-];
+const canvas=document.getElementById("canvas");
+const ctx=canvas.getContext("2d");
 
-let world=0,sequence=[],answers=[],busy=false,phase="ready";
-let xp=Number(localStorage.getItem("riftXP")||0);
-let wins=Number(localStorage.getItem("riftWins")||0);
-let level=1;
+let xp=Number(localStorage.getItem("riftXP2")||0);
+let best=Number(localStorage.getItem("riftBest2")||0);
 
-function update(){
-level=Math.min(8,1+Math.floor(wins/3));
+let running=false;
+let paused=false;
+let memoryMode=false;
+let distance=0;
+let lives=3;
+let speed=5;
+let frame=0;
+let obstacles=[];
+let stars=[];
+let particles=[];
+let lastTime=0;
+let nextGate=400;
+let invincible=0;
+
+const bike={
+x:155,
+y:0,
+vy:0,
+grounded:true,
+rotation:0
+};
+
+const groundY=345;
+const gravity=.65;
+const jumpPower=-13;
+
+let route=[];
+let routeIndex=0;
+let memoryTimer=null;
+
+function updateStats(){
 document.getElementById("xp").textContent=xp;
-document.getElementById("wins").textContent=wins;
-document.getElementById("level").textContent=level;
-localStorage.setItem("riftXP",xp);
-localStorage.setItem("riftWins",wins);
-}
-update();
-
-function choose(n,el){
-world=n;
-document.querySelectorAll(".world").forEach(x=>x.classList.remove("selected"));
-el.classList.add("selected");
+document.getElementById("distance").textContent=Math.floor(distance);
+document.getElementById("lives").textContent=lives;
+document.getElementById("best").textContent=best;
 }
 
-function start(){
+function startGame(){
+clearTimeout(memoryTimer);
 document.getElementById("home").classList.add("hidden");
 document.getElementById("game").classList.remove("hidden");
-document.getElementById("missionTitle").textContent=names[world]+" — LEVEL "+level;
-document.getElementById("story").textContent=stories[world];
-document.getElementById("status").textContent="Ready for your mission?";
-document.getElementById("launch").textContent="▶ SCAN ROUTE";
-document.getElementById("launch").disabled=false;
-document.getElementById("launch").classList.remove("hidden");
-phase="ready";
-draw();
+document.getElementById("memory").classList.add("hidden");
+
+running=true;
+paused=false;
+memoryMode=false;
+distance=0;
+lives=3;
+speed=5;
+frame=0;
+nextGate=400;
+invincible=0;
+obstacles=[];
+stars=[];
+particles=[];
+bike.y=groundY-30;
+bike.vy=0;
+bike.grounded=true;
+
+document.getElementById("message").textContent=
+"🚵 Race started! Jump over the rocks!";
+updateStats();
+lastTime=0;
+requestAnimationFrame(loop);
 }
 
-function draw(){
-const grid=document.getElementById("grid");
-grid.innerHTML="";
-for(let i=0;i<16;i++){
-let b=document.createElement("button");
-b.className="tile";
-b.setAttribute("aria-label","Checkpoint "+(i+1));
-b.onclick=()=>tap(i,b);
-grid.appendChild(b);
-}
-}
-
-function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
-
-async function showPattern(){
-if(busy)return;
-busy=true;
-phase="watch";
-answers=[];
-sequence=[];
-draw();
-document.getElementById("launch").disabled=true;
-const count=Math.min(7,2+level);
-let last=-1;
-for(let i=0;i<count;i++){
-let n;
-do{n=Math.floor(Math.random()*16)}while(n===last);
-sequence.push(n);
-last=n;
-}
-document.getElementById("status").textContent="👀 Watch carefully. Remember the route!";
-await sleep(650);
-const tiles=document.querySelectorAll(".tile");
-for(let n of sequence){
-tiles[n].classList.add("flash");
-await sleep(Math.max(380,850-level*55));
-tiles[n].classList.remove("flash");
-await sleep(260);
-}
-phase="answer";
-busy=false;
-document.getElementById("status").textContent="⚡ Your turn! Tap the checkpoints in the SAME order.";
-}
-
-async function tap(n,b){
-if(busy||phase!=="answer")return;
-let expected=sequence[answers.length];
-if(n!==expected){
-phase="finished";
-b.classList.add("wrong");
-document.getElementById("status").textContent="💥 Mission failed! Retry the route!";
-document.getElementById("launch").textContent="🔄 RETRY MISSION";
-document.getElementById("launch").disabled=false;
-return;
-}
-answers.push(n);
-b.classList.add("correct");
-await sleep(180);
-b.classList.remove("correct");
-if(answers.length===sequence.length){
-phase="finished";
-wins++;
-xp+=100+level*25;
-update();
-document.getElementById("status").textContent="🏆 MISSION COMPLETE! +"+(100+level*25)+" XP!";
-document.getElementById("launch").textContent="🚀 NEXT MISSION";
-document.getElementById("launch").disabled=false;
-document.getElementById("missionTitle").textContent=names[world]+" — LEVEL "+level;
+function jump(){
+if(!running||paused||memoryMode)return;
+if(bike.grounded){
+bike.vy=jumpPower;
+bike.grounded=false;
 }
 }
 
-function back(){
-if(busy)return;
-phase="ready";
+document.getElementById("jumpBtn").addEventListener("pointerdown",e=>{
+e.preventDefault();
+jump();
+});
+
+canvas.addEventListener("pointerdown",e=>{
+e.preventDefault();
+jump();
+});
+
+document.addEventListener("keydown",e=>{
+if(e.code==="Space"||e.code==="ArrowUp"){
+e.preventDefault();
+jump();
+}
+if(e.code==="KeyP")togglePause();
+});
+
+function togglePause(){
+if(!running||memoryMode)return;
+paused=!paused;
+document.getElementById("message").textContent=
+paused?"⏸ PAUSED":"🔥 KEEP RIDING!";
+}
+
+function goHome(){
+running=false;
+paused=false;
+memoryMode=false;
+clearTimeout(memoryTimer);
 document.getElementById("game").classList.add("hidden");
 document.getElementById("home").classList.remove("hidden");
 }
+
+function drawBackground(){
+const sky=ctx.createLinearGradient(0,0,0,groundY);
+sky.addColorStop(0,"#2589d5");
+sky.addColorStop(1,"#b8ecff");
+ctx.fillStyle=sky;
+ctx.fillRect(0,0,900,440);
+
+ctx.fillStyle="#ffe88c";
+ctx.beginPath();
+ctx.arc(745,85,38,0,Math.PI*2);
+ctx.fill();
+
+let offset=(distance*1.1)%360;
+
+for(let i=-1;i<5;i++){
+let x=i*360-offset;
+ctx.fillStyle="#7197a6";
+ctx.beginPath();
+ctx.moveTo(x,groundY);
+ctx.lineTo(x+170,110);
+ctx.lineTo(x+370,groundY);
+ctx.fill();
+
+ctx.fillStyle="#e5f7ff";
+ctx.beginPath();
+ctx.moveTo(x+128,169);
+ctx.lineTo(x+170,110);
+ctx.lineTo(x+216,169);
+ctx.lineTo(x+184,154);
+ctx.lineTo(x+169,163);
+ctx.fill();
+}
+
+ctx.fillStyle="#3c9b70";
+ctx.beginPath();
+ctx.moveTo(0,groundY);
+for(let x=0;x<=900;x+=20){
+ctx.lineTo(x,290+Math.sin((x+distance*.6)/85)*19);
+}
+ctx.lineTo(900,groundY);
+ctx.fill();
+
+ctx.fillStyle="#72503c";
+ctx.fillRect(0,groundY,900,95);
+ctx.fillStyle="#3bd27d";
+ctx.fillRect(0,groundY,900,9);
+
+ctx.fillStyle="#a87c54";
+for(let i=0;i<18;i++){
+let x=((i*75-distance*speed*.2)%1000+1000)%1000;
+ctx.fillRect(x,groundY+35,32,4);
+}
+}
+
+function drawBike(){
+ctx.save();
+ctx.translate(bike.x,bike.y);
+
+if(invincible>0&&Math.floor(frame/5)%2===0){
+ctx.globalAlpha=.35;
+}
+
+let spin=frame*.18;
+
+function wheel(x){
+ctx.strokeStyle="#111c30";
+ctx.lineWidth=6;
+ctx.beginPath();
+ctx.arc(x,0,20,0,Math.PI*2);
+ctx.stroke();
+
+ctx.strokeStyle="#c3f6ff";
+ctx.lineWidth=2;
+for(let i=0;i<6;i++){
+let a=i*Math.PI/3+spin;
+ctx.beginPath();
+ctx.moveTo(x,0);
+ctx.lineTo(x+18*Math.cos(a),18*Math.sin(a));
+ctx.stroke();
+}
+}
+
+wheel(-29);
+wheel(33);
+
+ctx.strokeStyle="#ffb31b";
+ctx.lineWidth=6;
+ctx.lineCap="round";
+ctx.beginPath();
+ctx.moveTo(-29,0);
+ctx.lineTo(-5,-26);
+ctx.lineTo(10,0);
+ctx.lineTo(-29,0);
+ctx.moveTo(-5,-26);
+ctx.lineTo(33,0);
+ctx.moveTo(33,0);
+ctx.lineTo(40,-30);
+ctx.stroke();
+
+ctx.strokeStyle="#1b2742";
+ctx.lineWidth=7;
+ctx.beginPath();
+ctx.moveTo(-8,-28);
+ctx.lineTo(0,-48);
+ctx.lineTo(18,-59);
+ctx.stroke();
+
+ctx.strokeStyle="#202d4b";
+ctx.beginPath();
+ctx.moveTo(0,-46);
+ctx.lineTo(-13,-15);
+ctx.moveTo(0,-46);
+ctx.lineTo(20,-17);
+ctx.stroke();
+
+ctx.fillStyle="#00e5ff";
+ctx.beginPath();
+ctx.arc(0,-56,12,0,Math.PI*2);
+ctx.fill();
+
+ctx.fillStyle="#ffcf57";
+ctx.beginPath();
+ctx.arc(13,-75,11,0,Math.PI*2);
+ctx.fill();
+
+ctx.fillStyle="#263c6e";
+ctx.fillRect(3,-84,22,8);
+
+ctx.restore();
+}
+
+function spawn(){
+if(frame%85===0){
+obstacles.push({
+x:940,
+y:groundY,
+w:28+Math.random()*18,
+h:25+Math.random()*15,
+hit:false
+});
+}
+
+if(frame%55===0){
+stars.push({
+x:940,
+y:groundY-65-Math.random()*65,
+taken:false
+});
+}
+}
+
+function drawObjects(){
+for(const o of obstacles){
+o.x-=speed;
+ctx.fillStyle="#465264";
+ctx.beginPath();
+ctx.moveTo(o.x,o.y);
+ctx.lineTo(o.x+o.w*.2,o.y-o.h);
+ctx.lineTo(o.x+o.w*.75,o.y-o.h*.85);
+ctx.lineTo(o.x+o.w,o.y);
+ctx.fill();
+}
+
+for(const s of stars){
+s.x-=speed;
+ctx.fillStyle="#ffde48";
+ctx.font="30px Arial";
+ctx.fillText("★",s.x,s.y);
+}
+}
+
+function collisions(){
+if(invincible>0)invincible--;
+
+for(const o of obstacles){
+if(o.hit)continue;
+
+if(
+bike.x+38>o.x&&
+bike.x-35<o.x+o.w&&
+bike.y+18>o.y-o.h
+){
+o.hit=true;
+lives--;
+invincible=65;
+document.getElementById("message").textContent=
+"💥 Watch out! "+lives+" lives left!";
+updateStats();
+
+if(lives<=0){
+endGame();
+return;
+}
+}
+}
+
+for(const s of stars){
+if(s.taken)continue;
+
+if(
+Math.abs(s.x-bike.x)<43&&
+Math.abs(s.y-(bike.y-40))<55
+){
+s.taken=true;
+xp+=20;
+localStorage.setItem("riftXP2",xp);
+updateStats();
+}
+}
+}
+
+function endGame(){
+running=false;
+if(distance>best){
+best=Math.floor(distance);
+localStorage.setItem("riftBest2",best);
+}
+updateStats();
+document.getElementById("message").innerHTML=
+"🏁 RACE OVER! Distance: "+
+Math.floor(distance)+
+"m — <button onclick='startGame()'>🔄 RACE AGAIN</button>";
+}
+
+function startMemory(){
+memoryMode=true;
+route=Array.from({length:3+Math.min(3,Math.floor(distance/800))},
+()=>Math.random()<.5?"L":"R");
+routeIndex=0;
+
+const box=document.getElementById("memory");
+box.classList.remove("hidden");
+document.getElementById("answerButtons").classList.add("hidden");
+
+document.getElementById("memoryText").textContent=
+"⚡ Memorize the secret trail!";
+document.getElementById("sequence").textContent=
+route.map(x=>x==="L"?"⬅️":"➡️").join(" ");
+document.getElementById("memoryProgress").textContent=
+"Get ready...";
+
+memoryTimer=setTimeout(()=>{
+if(!running||!memoryMode)return;
+document.getElementById("sequence").textContent="❓";
+document.getElementById("memoryText").textContent=
+"Choose the route in the correct order!";
+document.getElementById("answerButtons").classList.remove("hidden");
+document.getElementById("memoryProgress").textContent=
+"Checkpoint 1 / "+route.length;
+},Math.max(2200,4000-route.length*200));
+}
+
+function answer(choice){
+if(!memoryMode)return;
+
+if(choice!==route[routeIndex]){
+document.getElementById("message").textContent=
+"⚠️ Wrong route! Try again next time.";
+lives=Math.max(0,lives-1);
+finishMemory();
+return;
+}
+
+routeIndex++;
+
+if(routeIndex===route.length){
+xp+=100;
+localStorage.setItem("riftXP2",xp);
+document.getElementById("message").textContent=
+"🏆 SECRET ROUTE COMPLETE! +100 XP!";
+finishMemory();
+}else{
+document.getElementById("memoryProgress").textContent=
+"Checkpoint "+(routeIndex+1)+" / "+route.length;
+}
+}
+
+function finishMemory(){
+memoryMode=false;
+document.getElementById("memory").classList.add("hidden");
+updateStats();
+
+if(lives<=0){
+endGame();
+return;
+}
+
+nextGate=distance+450;
+}
+
+function loop(time){
+if(!running)return;
+
+if(!lastTime)lastTime=time;
+const dt=Math.min((time-lastTime)/16.67,2);
+lastTime=time;
+
+if(!paused&&!memoryMode){
+frame++;
+distance+=speed*.15*dt;
+speed=Math.min(9,5+distance/1300);
+
+bike.vy+=gravity*dt;
+bike.y+=bike.vy*dt;
+
+if(bike.y>=groundY-30){
+bike.y=groundY-30;
+bike.vy=0;
+bike.grounded=true;
+}
+
+spawn();
+collisions();
+
+obstacles=obstacles.filter(o=>o.x>-70);
+stars=stars.filter(s=>s.x>-50&&!s.taken);
+
+if(distance>=nextGate&&running){
+startMemory();
+}
+
+if(distance>best){
+best=Math.floor(distance);
+localStorage.setItem("riftBest2",best);
+}
+
+updateStats();
+}
+
+drawBackground();
+drawObjects();
+drawBike();
+
+ctx.fillStyle="rgba(5,15,35,.65)";
+ctx.fillRect(12,12,220,44);
+ctx.fillStyle="white";
+ctx.font="bold 19px Arial";
+ctx.fillText("🚵 MTB WILDLANDS",25,40);
+
+if(paused){
+ctx.fillStyle="rgba(0,0,0,.5)";
+ctx.fillRect(0,0,900,440);
+ctx.fillStyle="white";
+ctx.font="bold 45px Arial";
+ctx.fillText("PAUSED",355,220);
+}
+
+if(memoryMode){
+ctx.fillStyle="rgba(0,0,0,.4)";
+ctx.fillRect(0,0,900,440);
+ctx.fillStyle="#ffe36e";
+ctx.font="bold 36px Arial";
+ctx.fillText("SECRET ROUTE!",300,210);
+}
+
+requestAnimationFrame(loop);
+}
+
+updateStats();
 </script>
+
 </body>
 </html>
